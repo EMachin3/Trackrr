@@ -65,8 +65,9 @@ INSERT INTO tv_episode (episode_num, minutes_len, season, show)
   VALUES (2, 24, (SELECT id FROM tv_season WHERE season_num=1 
   AND show=(SELECT id FROM tv_show WHERE title='Better Call Saul')), 
   (SELECT id FROM tv_show WHERE title='Better Call Saul'));
-select tv_show.title, tv_show.descr, tv_season.season_num, tv_season.num_episodes 
- from tv_season inner join tv_show on tv_show.id=tv_season.show_id;
-select tv_show.title, tv_season.season_num, tv_episode.episode_num, tv_episode.title, tv_episode.minutes_len from tv_season 
+-- select tv_show.title, tv_show.descr, tv_season.season_num, tv_season.num_episodes 
+--  from tv_season inner join tv_show on tv_show.id=tv_season.show_id;
+-- idk why i have to select from tv_season for this to work but at this point i'm not going to question it
+select media.title, tv_season.season_num, tv_episode.episode_num, tv_episode.title, tv_episode.descr, tv_episode.minutes_len from tv_season                                                           
  inner join tv_episode on tv_episode.season_id=tv_season.id
- inner join tv_show on  tv_show.id=tv_season.show_id;
+ inner join media on media.id=tv_season.show_id where media.media_type='tv_show' order by (tv_season.season_num, tv_episode.episode_num);
