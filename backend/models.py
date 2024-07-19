@@ -7,49 +7,70 @@ from app import db
 
 class Content(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    content_type: Mapped[str]
+    content_type: Mapped[str] #TODO: duplicate field with content_collection, duplication might be necessary for polymorphism though
     title: Mapped[str]
     descr: Mapped[Optional[str]]
     picture: Mapped[Optional[str]]
-    #todo: maybe store info about amount of people who have it logged?
     logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
+    collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
+    #todo: maybe store info about amount of people who have it logged?
     __mapper_args__ = {
         "polymorphic_on": "content_type",
         "polymorphic_identity": "content",
     }
     
+class ContentCollection(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    content_type: Mapped[str]
+    title: Mapped[str] = mapped_column(String, unique=True)
+    descr: Mapped[Optional[str]]
+    picture: Mapped[Optional[str]]
+    __mapper_args__ = {
+        "polymorphic_on": "content_type",
+        "polymorphic_identity": "content_collection",
+    }
+    
 #TODO: add some way to sensibly keep track of if individual episodes and seasons have been watched
-class TvShow(Content):
+class TvShows(ContentCollection):
     # id: Mapped[int] = mapped_column(primary_key=True)
+    # content_type: Mapped[str]
     # title: Mapped[str] = mapped_column(String, unique=True)
     # descr: Mapped[Optional[str]]
     # picture: Mapped[Optional[str]]
     num_seasons: Mapped[Optional[int]]
     num_episodes: Mapped[Optional[int]]
-    seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
+    # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="show")
     __mapper_args__ = {
         "polymorphic_identity": "tv_show",
     }
     
-class TvSeasons(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    season_num: Mapped[Optional[int]]
-    num_episodes: Mapped[Optional[int]]
-    show_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
-    # show: Mapped[TvShow] = relationship("Content", back_populates="seasons")
-    episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="season")
+# class TvSeasons(db.Model):
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     season_num: Mapped[Optional[int]]
+#     num_episodes: Mapped[Optional[int]]
+#     show_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
+#     # show: Mapped[TvShow] = relationship("Content", back_populates="seasons")
+#     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="season")
     
-class TvEpisodes(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[Optional[str]] = mapped_column(String, unique=True)
-    descr: Mapped[Optional[str]]
-    episode_num: Mapped[int]
+class TvEpisodes(Content):
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # content_type: Mapped[str]
+    # title: Mapped[str]
+    # descr: Mapped[Optional[str]]
+    # picture: Mapped[Optional[str]]
+    # logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
+    # collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
+    season_num: Mapped[Optional[int]] #this being optional is not ideal but the other case forces other children to be not null for some reason
+    episode_num: Mapped[Optional[int]]
     minutes_len: Mapped[Optional[int]]
-    season_id: Mapped[int] = mapped_column(Integer, ForeignKey("tv_seasons.id"))
+    # season_id: Mapped[int] = mapped_column(Integer, ForeignKey("tv_seasons.id"))
     # season: Mapped[TvSeasons] = relationship("TvSeasons", back_populates="episodes")
-    show_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
+    # show_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
     # show: Mapped[TvShow] = relationship("Content", back_populates="episodes")
+    __mapper_args__ = {
+        "polymorphic_identity": "tv_episode",
+    }
 
 class Users(db.Model):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -78,6 +99,7 @@ class Movies(Content):
     # title: Mapped[str] = mapped_column(String, unique=True)
     # descr: Mapped[Optional[str]]
     # picture: Mapped[Optional[str]]
+    # collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
     __mapper_args__ = {
         "polymorphic_identity": "movie",
     }

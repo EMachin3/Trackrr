@@ -68,6 +68,19 @@ INSERT INTO tv_episode (episode_num, minutes_len, season, show)
 -- select tv_show.title, tv_show.descr, tv_season.season_num, tv_season.num_episodes 
 --  from tv_season inner join tv_show on tv_show.id=tv_season.show_id;
 -- idk why i have to select from tv_season for this to work but at this point i'm not going to question it
-select media.title, tv_season.season_num, tv_episode.episode_num, tv_episode.title, tv_episode.descr, tv_episode.minutes_len from tv_season                                                           
- inner join tv_episode on tv_episode.season_id=tv_season.id
- inner join media on media.id=tv_season.show_id where media.media_type='tv_show' order by (tv_season.season_num, tv_episode.episode_num);
+-- select media.title, tv_season.season_num, tv_episode.episode_num, tv_episode.title, tv_episode.descr, tv_episode.minutes_len from tv_season                                                           
+--   inner join tv_episode on tv_episode.season_id=tv_season.id
+--   inner join media on media.id=tv_season.show_id where media.media_type='tv_show' order by (tv_season.season_num, tv_episode.episode_num);
+
+-- below are some sample test queries (the commented ones above are probably outdated)
+
+--get all user-logged movies and tv episodes
+select content_collection.title, content.content_type, content.title, logged_content.status, logged_content.rating, logged_content.user_review from logged_content 
+  inner join content on content.id=logged_content.content_id 
+  left join content_collection on content.collection_id=content_collection.id
+  where content.content_type in ('movie', 'tv_episode');
+
+--get all stored content with reviews if they exist
+select content_collection.title, content.content_type, content.title, logged_content.status, logged_content.rating, logged_content.user_review from logged_content 
+  right join content on content.id=logged_content.content_id 
+  left join content_collection on content.collection_id=content_collection.id;
