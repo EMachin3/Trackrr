@@ -3,8 +3,10 @@ import uuid
 from typing import Optional, List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UUID, ForeignKey, Integer, String, DateTime, func
-from app import db
+from database import db
+from dataclasses import dataclass
 
+@dataclass
 class Content(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     content_type: Mapped[str] #TODO: duplicate field with content_collection, duplication might be necessary for polymorphism though
@@ -18,7 +20,8 @@ class Content(db.Model):
         "polymorphic_on": "content_type",
         "polymorphic_identity": "content",
     }
-    
+
+@dataclass
 class ContentCollection(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     content_type: Mapped[str]
@@ -72,6 +75,7 @@ class TvEpisodes(Content):
         "polymorphic_identity": "tv_episode",
     }
 
+@dataclass
 class Users(db.Model):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username: Mapped[str] = mapped_column(unique=True)
@@ -79,6 +83,7 @@ class Users(db.Model):
     password_hash: Mapped[str]
     logged_content: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="user")
 
+@dataclass
 class LoggedContent(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     content_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
@@ -104,6 +109,7 @@ class Movies(Content):
         "polymorphic_identity": "movie",
     }
 
+@dataclass
 class Books(db.Model):
     # def __init__(self, title, author, pages_num, review = None):
     #     self.title = title
