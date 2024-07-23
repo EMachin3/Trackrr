@@ -28,12 +28,12 @@ class ContentCollection(db.Model):
     title: Mapped[str] = mapped_column(String, unique=True)
     descr: Mapped[Optional[str]]
     picture: Mapped[Optional[str]]
+    logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_collection_ref")
     __mapper_args__ = {
         "polymorphic_on": "content_type",
         "polymorphic_identity": "content_collection",
     }
     
-#TODO: add some way to sensibly keep track of if individual episodes and seasons have been watched
 class TvShows(ContentCollection):
     # id: Mapped[int] = mapped_column(primary_key=True)
     # content_type: Mapped[str]
@@ -46,6 +46,19 @@ class TvShows(ContentCollection):
     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="show")
     __mapper_args__ = {
         "polymorphic_identity": "tv_show",
+    }
+
+class MovieSeries(ContentCollection):
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # content_type: Mapped[str]
+    # title: Mapped[str] = mapped_column(String, unique=True)
+    # descr: Mapped[Optional[str]]
+    # picture: Mapped[Optional[str]]
+    num_movies: Mapped[Optional[int]]
+    # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
+    movies: Mapped[List["Movies"]] = relationship("Movies", backref="movie_series")
+    __mapper_args__ = {
+        "polymorphic_identity": "movie_series",
     }
     
 # class TvSeasons(db.Model):
@@ -86,7 +99,8 @@ class Users(db.Model):
 @dataclass
 class LoggedContent(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    content_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
+    content_collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
+    content_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content.id"))
     user_id: Mapped[int] = mapped_column(UUID, ForeignKey("users.id"))
     status: Mapped[str] # options: want_to_consume, consuming, finished, dropped. (probably could and should support want to watch/play/listen differentation)
     rating: Mapped[Optional[float]] #decimal from 0.0 to 10 in 0.1 increments

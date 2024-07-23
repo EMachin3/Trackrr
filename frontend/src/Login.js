@@ -41,18 +41,18 @@ function Login() {
         {/* <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe> */}
         <div className="App">
             <header className="App-header">
-                <h1>Books</h1>
-                <form action="/api/test" method="post" class="form-example"> {/*target="dummyframe"*/}
+                <h1>Welcome to Trackrr</h1>
+                <form action="/api/login" method="post" class="form-example"> {/*target="dummyframe"*/}
                     <div class="form-example">
-                        <label for="username">Enter your username: </label>
+                        <label for="username">Username: </label>
                         <input type="text" name="username" id="username" required />
                     </div>
                     <div class="form-example">
-                        <label for="password">Enter your password: </label>
+                        <label for="password">Password: </label>
                         <input type="password" name="password" id="password" required />
                     </div>
                     <div class="form-example">
-                        <input type="submit" value="Subscribe!" />
+                        <input type="submit" value="Log in" />
                     </div>
                 </form>
 

@@ -1,6 +1,8 @@
 # import psycopg2
-from app import app, Base, db
+from app import app
+from database import Base, db
 from models import *
+import os
 
 # currently has some testing data, in the future the table won't be prepopulated
 with app.app_context():
@@ -25,12 +27,18 @@ with app.app_context():
     # seasonTwo.episodes.append(s2e2)
     db.session.add(show)
     
-    godfather = Movies(title="The Godfather", descr="An old mafia boss's son gets more involved with his father's business.")
+    godfatherSeries = MovieSeries(title="The Godfather Trilogy", descr="One of the most iconic mob movie trilogies of all time", num_movies=3)
+    godfather = Movies(title="The Godfather Pt. 1", descr="An old mafia boss's son gets more involved with his father's business.", movie_series=godfatherSeries)
+    godfatherPart2 = Movies(title="The Godfather Pt. 2", descr="Michael Corelone serves as the Don of his crime family.", movie_series=godfatherSeries)
     # db.session.add(godfather)
-    testuser = Users(username="test", email="test@example.org", password_hash="fdyujxerst")
+    testuser = Users(username="test", email="test@example.org", password_hash=os.environ['TEST_USER_PASSWORD'])
     # db.session.add(testuser)
-    loggedMovie = LoggedContent(user=testuser, content_ref=godfather, status='watched', rating=10.0, user_review='An all-time classic')
-    loggedShow = LoggedContent(user=testuser, content_ref=s1e1, status='watched', rating=8.0, user_review='A good start to a GREAT show.')
+    loggedShow = LoggedContent(user=testuser, content_collection_ref=show, status='watched', rating=9.5, user_review='A deserving successor to Breaking Bad that keeps getting better and better.')
+    loggedMovieSeries = LoggedContent(user=testuser, content_collection_ref=godfatherSeries, status='in_progress')
+    loggedMovieOne = LoggedContent(user=testuser, content_ref=godfather, status='watched', rating=10.0, user_review='An all-time classic')
+    loggedMovieTwo = LoggedContent(user=testuser, content_ref=godfatherPart2, status='want to watch')
+    loggedEpisodeOne = LoggedContent(user=testuser, content_ref=s1e1, status='watched', rating=8.0, user_review='A good start to a GREAT show.')
+    loggedEpisodeTwo = LoggedContent(user=testuser, content_ref=s1e2, status='watched', rating=9.0, user_review='Yeah... this definitely isn\'t just a show about lawyers.')
     # db.session.add(loggedMovie)
     # db.session.add(loggedShow)
     db.session.add(testuser)

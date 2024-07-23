@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, redirect, session, flash
+from flask import Flask, jsonify, request, redirect, session, flash, g
 import os
 from passlib.hash import bcrypt
 from database import db
@@ -23,7 +23,7 @@ db.init_app(app)
 #         password=os.environ['DB_PASSWORD'])
 #     return conn
 
-@app.route('/api/test', methods=(['POST']))
+@app.route('/api/login', methods=(['POST']))
 def test_form_submit():
     #if request.method == 'POST':
     username = request.form['username']
@@ -40,11 +40,44 @@ def test_form_submit():
         print('Login succeeded.')
         session.clear()
         session['user_id'] = user.id
+        g.user = user
         return redirect('/')
+    g.user = None
+    session.clear()
     print(error)
     flash(error)
     
     return redirect('/test') #TODO: add a more user-friendly way to login error
+    
+@app.route('/api/logout')
+def logout():
+    session.clear()
+    return redirect('/test')
+
+@app.route('/api/collections', methods=(['GET'])) #TODO: add post and put later
+def get_collections():
+    #if 'collection' in request.args:
+    if 'user_id' not in session:
+        return redirect('/error/') #TODO: instead direct user to login page or rather send a json response indicating you're not signed in
+    stmt = db.select(ContentCollection.title, ContentCollection.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review).select_from(LoggedContent).filter_by(user_id=session['user_id'])
+    if 'status' in request.args:
+        stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
+    stmt = stmt.join(ContentCollection, LoggedContent.content_collection_id == ContentCollection.id)
+    if 'content_type' in request.args:
+        stmt = stmt.filter(ContentCollection.content_type.in_(request.args.get('content_type').split(',')))
+    collections = db.session.execute(stmt).all()
+    return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4]} for x in collections]
+    
+@app.route('/api/content/<collection_id>')
+def get_collection_contents(collection_id):
+    stmt = db.select(Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review).select_from(LoggedContent).filter_by(user_id=session['user_id'])
+    if 'status' in request.args:
+        stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
+    stmt = stmt.join(Content, LoggedContent.content_id == Content.id).filter_by(collection_id=collection_id)
+    if 'content_type' in request.args:
+        stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
+    content = db.session.execute(stmt).all()
+    return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4]} for x in content]
 @app.route('/data')
 def test_data():
     books = db.session.execute(db.select(Content)).scalars()

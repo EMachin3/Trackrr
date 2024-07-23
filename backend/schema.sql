@@ -82,5 +82,11 @@ select content_collection.title, content.content_type, content.title, logged_con
 
 --get all stored content with reviews if they exist
 select content_collection.title, content.content_type, content.title, logged_content.status, logged_content.rating, logged_content.user_review from logged_content 
-  right join content on content.id=logged_content.content_id 
-  left join content_collection on content.collection_id=content_collection.id;
+  join content on content.id=logged_content.content_id 
+  join content_collection on content.collection_id=content_collection.id;
+  
+  --better:
+  -- get all logged content collections
+  select content_collection.title, content_collection.content_type, logged_content.status, logged_content.rating, logged_content.user_review from logged_content join content_collection on logged_content.content_collection_id=content_collection.id;
+  -- get all logged content
+  select content.title, content.content_type, logged_content.status, logged_content.rating, logged_content.user_review from logged_content join content on logged_content.content_id=content.id;
