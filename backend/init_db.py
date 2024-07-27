@@ -6,7 +6,7 @@ import os
 
 # currently has some testing data, in the future the table won't be prepopulated
 with app.app_context():
-    Base.metadata.drop_all(db.engine, [TvEpisodes.__table__, LoggedContent.__table__, Users.__table__, ContentCollection.__table__, Books.__table__])
+    Base.metadata.drop_all(db.engine, [TvEpisodes.__table__, LoggedContent.__table__, Users.__table__, Content.__table__, Books.__table__])
     db.create_all()
     db.session.add(Books(title='A Tale of Two Cities', author='Charles Dickens', pages_num=489, review='A great classic!'))
     show = TvShows(title="Better Call Saul", descr="A struggling lawyer tries to make a name for himself.", num_seasons=6, num_episodes=63)
@@ -27,65 +27,37 @@ with app.app_context():
     # seasonTwo.episodes.append(s2e2)
     db.session.add(show)
     
-    godfatherSeries = MovieSeries(title="The Godfather Trilogy", descr="One of the most iconic mob movie trilogies of all time", num_movies=3)
-    godfather = Movies(title="The Godfather Pt. 1", descr="An old mafia boss's son gets more involved with his father's business.", movie_series=godfatherSeries)
-    godfatherPart2 = Movies(title="The Godfather Pt. 2", descr="Michael Corelone serves as the Don of his crime family.", movie_series=godfatherSeries)
-    # db.session.add(godfather)
+    # godfatherSeries = MovieSeries(title="The Godfather Trilogy", descr="One of the most iconic mob movie trilogies of all time", num_movies=3)
+    godfather = Movies(title="The Godfather Pt. 1", descr="An old mafia boss's son gets more involved with his father's business.")
+    godfatherPart2 = Movies(title="The Godfather Pt. 2", descr="Michael Corelone serves as the Don of his crime family.")
+    db.session.add(godfather)
+    db.session.add(godfatherPart2)
     testuser = Users(username="test", email="test@example.org", password_hash=os.environ['TEST_USER_PASSWORD'])
     # db.session.add(testuser)
-    loggedShow = LoggedContent(user=testuser, content_collection_ref=show, status='watched', rating=9.5, user_review='A deserving successor to Breaking Bad that keeps getting better and better.')
-    loggedMovieSeries = LoggedContent(user=testuser, content_collection_ref=godfatherSeries, status='in_progress')
+    loggedShow = LoggedContent(user=testuser, content_ref=show, status='watched', rating=9.5, user_review='A deserving successor to Breaking Bad that keeps getting better and better.')
+    # loggedMovieSeries = LoggedContent(user=testuser, content_ref=godfatherSeries, status='in_progress')
     loggedMovieOne = LoggedContent(user=testuser, content_ref=godfather, status='watched', rating=10.0, user_review='An all-time classic')
     loggedMovieTwo = LoggedContent(user=testuser, content_ref=godfatherPart2, status='want to watch')
-    loggedEpisodeOne = LoggedContent(user=testuser, content_ref=s1e1, status='watched', rating=8.0, user_review='A good start to a GREAT show.')
-    loggedEpisodeTwo = LoggedContent(user=testuser, content_ref=s1e2, status='watched', rating=9.0, user_review='Yeah... this definitely isn\'t just a show about lawyers.')
+    loggedEpisodeOne = LoggedContent(user=testuser, content_part_ref=s1e1, status='watched', rating=8.0, user_review='A good start to a GREAT show.')
+    loggedEpisodeTwo = LoggedContent(user=testuser, content_part_ref=s1e2, status='watched', rating=9.0, user_review='Yeah... this definitely isn\'t just a show about lawyers.')
+    # adding more shows below to test the search functionality
+    deathNote = TvShows(title="Death Note", descr="A bored student finds a book that will kill anyone whose name he writes in it...", num_seasons=1, num_episodes=37)
+    deathNoteEpisode1 = TvEpisodes(title="Rebirth", descr="Light Yagami learns how the Death Note works and decides to use it to rid the world of evil.", episode_num=1, minutes_len=23, season_num=1, show=deathNote)
+    deathNoteEpisode2 = TvEpisodes(title="Confrontation", descr="Light learns that his plan isn't going to be as easy as it seems...", episode_num=2, minutes_len=23, season_num=1, show=deathNote)
+    mobPsycho100 = TvShows(title="Mob Psycho 100", descr="A student tries to learn to control his incredible psychic powers while exorcising various spirits with the help of a con artist.", num_seasons=1, num_episodes=12)
+    onePunchMan = TvShows(title="One Punch Man", descr="An interesting super hero can defeat any of his enemies in just one punch.", num_seasons=2, num_episodes=24)
+    # db.session.add(deathNote)
+    # db.session.add(mobPsycho100)
+    # db.session.add(onePunchMan)
+    
+    LoggedContent(user=testuser, content_ref=deathNote, status='watched', rating=9.0)
+    LoggedContent(user=testuser, content_part_ref=deathNoteEpisode1, status='watched')
+    LoggedContent(user=testuser, content_part_ref=deathNoteEpisode2, status='watched')
+    LoggedContent(user=testuser, content_ref=mobPsycho100, status='in_progress')
+    LoggedContent(user=testuser, content_ref=onePunchMan, status='in_progress')
+    
     # db.session.add(loggedMovie)
     # db.session.add(loggedShow)
     db.session.add(testuser)
     db.session.commit()
     print("Database created and populated.")
-# conn = psycopg2.connect(
-#     host="localhost",
-#     database="flask_db",
-#     user=os.environ['DB_USERNAME'],
-#     password=os.environ['DB_PASSWORD'])
-# cur = conn.cursor()
-# with open('schema.sql') as f:
-#     cur.execute(f.read())
-
-# # Open a cursor to perform database operations
-# cur = conn.cursor()
-
-# # Execute a command: this creates a new table
-# cur.execute('DROP TABLE IF EXISTS books;')
-# cur.execute('CREATE TABLE books (id serial PRIMARY KEY,'
-#                                  'title varchar (150) NOT NULL,'
-#                                  'author varchar (50) NOT NULL,'
-#                                  'pages_num integer NOT NULL,'
-#                                  'review text,'
-#                                  'date_added date DEFAULT CURRENT_TIMESTAMP);'
-#                                  )
-
-# # Insert data into the table
-
-# cur.execute('INSERT INTO books (title, author, pages_num, review)'
-#             'VALUES (%s, %s, %s, %s)',
-#             ('A Tale of Two Cities',
-#              'Charles Dickens',
-#              489,
-#              'A great classic!')
-#             )
-
-
-# cur.execute('INSERT INTO books (title, author, pages_num, review)'
-#             'VALUES (%s, %s, %s, %s)',
-#             ('Anna Karenina',
-#              'Leo Tolstoy',
-#              864,
-#              'Another great classic!')
-#             )
-
-# conn.commit()
-
-# cur.close()
-# conn.close()

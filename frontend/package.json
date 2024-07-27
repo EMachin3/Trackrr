@@ -2,7 +2,8 @@
   "name": "trackrr",
   "version": "0.1.0",
   "private": true,
-  "allowedHosts": ["localhost", ".localhost"],
+  "allowedHosts": [
+    "localhost"],
   "proxy": "http://localhost:5000/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
@@ -12,6 +13,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.24.1",
     "react-scripts": "5.0.1",
+    "styled-components": "^6.1.12",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

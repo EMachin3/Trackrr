@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Login from './Login';
+import Login from './components/Login';
+import Home from './components/Home';
+import Landing from './components/Landing';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -10,15 +12,20 @@ const router = createBrowserRouter(
     {
       path: '/',
       element: (
+        <Landing />
+      )
+    },
+    {
+      path: '/login',
+      element: (
         <Login />
       )
     },
     {
-      path: '/test',
+      path: '/home',
       element: (
         <>
-        <p>Test</p>
-        {/* <App /> */}
+        <Home />
         </>
       )
     }

@@ -1,5 +1,5 @@
 import React/*, { useState, useEffect }*/ from "react";
-import "./App.css";
+import "../App.css";
 
 function Login() {
     // usestate for setting a javascript
@@ -41,7 +41,7 @@ function Login() {
         {/* <iframe name="dummyframe" id="dummyframe" style={{display: "none"}}></iframe> */}
         <div className="App">
             <header className="App-header">
-                <h1>Welcome to Trackrr</h1>
+                <h1>Log In</h1>
                 <form action="/api/login" method="post" class="form-example"> {/*target="dummyframe"*/}
                     <div class="form-example">
                         <label for="username">Username: </label>

@@ -6,35 +6,43 @@ from sqlalchemy import UUID, ForeignKey, Integer, String, DateTime, func
 from database import db
 from dataclasses import dataclass
 
+'''
+This model represents a portion of a piece of content that does not conceptually stand on its own.
+An example would be an episode of a TV show or podcast.
+'''
 @dataclass
-class Content(db.Model):
+class ContentPart(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    content_type: Mapped[str] #TODO: duplicate field with content_collection, duplication might be necessary for polymorphism though
+    content_type: Mapped[str] #TODO: duplicate field with content, duplication might be necessary for polymorphism though
     title: Mapped[str]
     descr: Mapped[Optional[str]]
     picture: Mapped[Optional[str]]
-    logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
-    collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
+    logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_part_ref")
+    content_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content.id"))
     #todo: maybe store info about amount of people who have it logged?
     __mapper_args__ = {
         "polymorphic_on": "content_type",
-        "polymorphic_identity": "content",
+        "polymorphic_identity": "content_part",
     }
 
+'''
+This model content that conceptually stands on its own.
+Examples would include a movie, a video game, or a TV show as a whole.
+'''
 @dataclass
-class ContentCollection(db.Model):
+class Content(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     content_type: Mapped[str]
     title: Mapped[str] = mapped_column(String, unique=True)
     descr: Mapped[Optional[str]]
     picture: Mapped[Optional[str]]
-    logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_collection_ref")
+    logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
     __mapper_args__ = {
         "polymorphic_on": "content_type",
-        "polymorphic_identity": "content_collection",
+        "polymorphic_identity": "content",
     }
     
-class TvShows(ContentCollection):
+class TvShows(Content):
     # id: Mapped[int] = mapped_column(primary_key=True)
     # content_type: Mapped[str]
     # title: Mapped[str] = mapped_column(String, unique=True)
@@ -48,28 +56,21 @@ class TvShows(ContentCollection):
         "polymorphic_identity": "tv_show",
     }
 
-class MovieSeries(ContentCollection):
-    # id: Mapped[int] = mapped_column(primary_key=True)
-    # content_type: Mapped[str]
-    # title: Mapped[str] = mapped_column(String, unique=True)
-    # descr: Mapped[Optional[str]]
-    # picture: Mapped[Optional[str]]
-    num_movies: Mapped[Optional[int]]
-    # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
-    movies: Mapped[List["Movies"]] = relationship("Movies", backref="movie_series")
-    __mapper_args__ = {
-        "polymorphic_identity": "movie_series",
-    }
+# class MovieSeries(Content): # TODO: commenting this for now because i don't think storing movie series conceptually makes sense
+                              #       because a movie is a piece of content that can conceptually exist on its own unlike a TV episode
+#     # id: Mapped[int] = mapped_column(primary_key=True)
+#     # content_type: Mapped[str]
+#     # title: Mapped[str] = mapped_column(String, unique=True)
+#     # descr: Mapped[Optional[str]]
+#     # picture: Mapped[Optional[str]]
+#     num_movies: Mapped[Optional[int]]
+#     # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
+#     movies: Mapped[List["Movies"]] = relationship("Movies", backref="movie_series")
+#     __mapper_args__ = {
+#         "polymorphic_identity": "movie_series",
+#     }
     
-# class TvSeasons(db.Model):
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     season_num: Mapped[Optional[int]]
-#     num_episodes: Mapped[Optional[int]]
-#     show_id: Mapped[int] = mapped_column(Integer, ForeignKey("content.id"))
-#     # show: Mapped[TvShow] = relationship("Content", back_populates="seasons")
-#     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="season")
-    
-class TvEpisodes(Content):
+class TvEpisodes(ContentPart):
     # id: Mapped[int] = mapped_column(primary_key=True)
     # content_type: Mapped[str]
     # title: Mapped[str]
@@ -99,8 +100,8 @@ class Users(db.Model):
 @dataclass
 class LoggedContent(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    content_collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
     content_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content.id"))
+    content_part_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_part.id"))
     user_id: Mapped[int] = mapped_column(UUID, ForeignKey("users.id"))
     status: Mapped[str] # options: want_to_consume, consuming, finished, dropped. (probably could and should support want to watch/play/listen differentation)
     rating: Mapped[Optional[float]] #decimal from 0.0 to 10 in 0.1 increments
@@ -118,7 +119,6 @@ class Movies(Content):
     # title: Mapped[str] = mapped_column(String, unique=True)
     # descr: Mapped[Optional[str]]
     # picture: Mapped[Optional[str]]
-    # collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
     __mapper_args__ = {
         "polymorphic_identity": "movie",
     }

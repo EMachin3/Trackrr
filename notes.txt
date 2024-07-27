@@ -1,0 +1,3 @@
+make a component for a content collection box that takes in a prop with title, type, picture, status, user review, and rating
+
+layout from left to right: picture, title, view episodes button, change status button
