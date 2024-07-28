@@ -1,8 +1,7 @@
 import "../App.css";
 import styled from "styled-components";
 import godfather from "../assets/the-godfather.svg";
-import { redirect, useNavigate } from "react-router-dom";
-import { React, useState, useEffect } from "react";
+import { React } from "react";
 
 function ContentCollectionBox({ attrs }) {
     const CollectionContainer = styled.div`
