@@ -1,11 +1,11 @@
 import "../App.css";
-import ContentBox from "./ContentBox.js";
 //import { /*redirect,*/ useNavigate } from "react-router-dom";
-import { React, useState, useEffect } from "react";
-import ContentSearch from "./ContentSearch";
-import UserLogs from "./UserLogs.js";
+import { React } from "react";
+import ContentSearch from "../components/ContentSearch.js";
+import UserLogs from "../components/UserLogs.js";
 
 function Home() {
+    //TODO: do something if you go here but aren't signed in, see commented code on UserLogs
     return (
         <>
             <header className="App-header">

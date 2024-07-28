@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Login from './components/Login';
-import Home from './components/Home';
-import Landing from './components/Landing';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Landing from './pages/Landing';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
