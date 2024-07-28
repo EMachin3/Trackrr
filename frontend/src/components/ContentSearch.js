@@ -1,7 +1,7 @@
 import "../App.css";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
-import { React, useState, useEffect } from "react";
+import { React, useState/*, useEffect*/ } from "react";
 import { useNavigate } from "react-router-dom";
 
 
