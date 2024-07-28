@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import { React, useState/*, useEffect*/ } from "react";
 import { useNavigate } from "react-router-dom";
+import ContentBox from "./ContentBox";
 
 
 const SearchWrapper = styled.div`
@@ -73,7 +74,7 @@ function ContentSearch() {
         }
     return (
         <>
-        <form style={{ marginTop: '10px' }} onSubmit={handleSubmit}>
+        <form style={{ margin: '30px 0px' }} onSubmit={handleSubmit}>
             <SearchWrapper>
                 <SearchEntry name="search" placeholder="Search" value={keywords} onChange={e => setKeywords(e.target.value)} />
                 <SearchButton type="submit"><FaSearch size={31} /></SearchButton>
@@ -81,10 +82,7 @@ function ContentSearch() {
         </form>
         {fetchedData && fetchedData.map((datum, index) => {
             return (
-            <>
-            <p>Content title: {datum.title}</p>
-            <p>Content description: {datum.description}</p>
-            </>
+                <ContentBox image_height={100} title={datum.title} image={datum.picture}/>
             )
         })}
         </>

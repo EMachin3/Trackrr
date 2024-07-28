@@ -3,7 +3,7 @@ import styled from "styled-components";
 //import godfather from "../assets/the-godfather.svg";
 import { React } from "react";
 
-function ContentBox({ title, image }) {
+function ContentBox({ title, image, image_height }) {
     const ContentContainer = styled.div`
 	border: 2px solid black;
 	display: flex;
@@ -12,7 +12,7 @@ function ContentBox({ title, image }) {
     width: 800px;
     `
     const ContentImage = styled.img`
-    height: 175px;
+    height: ${image_height}px;
 	width: auto;
     position: relative;
     left: 25px;

@@ -6,6 +6,7 @@ import UserLogs from "../components/UserLogs.js";
 
 function Home() {
     //TODO: do something if you go here but aren't signed in, see commented code on UserLogs
+    //TODO: add a default "no image found" thing
     return (
         <>
             <header className="App-header">

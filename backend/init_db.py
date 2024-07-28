@@ -9,7 +9,7 @@ with app.app_context():
     Base.metadata.drop_all(db.engine, [TvEpisodes.__table__, LoggedContent.__table__, Users.__table__, Content.__table__, Books.__table__])
     db.create_all()
     db.session.add(Books(title='A Tale of Two Cities', author='Charles Dickens', pages_num=489, review='A great classic!'))
-    show = TvShows(title="Better Call Saul", descr="A struggling lawyer tries to make a name for himself.", num_seasons=6, num_episodes=63)
+    show = TvShows(title="Better Call Saul", descr="A struggling lawyer tries to make a name for himself.", num_seasons=6, num_episodes=63, picture='Better_Call_Saul_logo.svg')
     # db.session.add(show)
     # db.session.commit()
     # seasonOne = TvSeasons(season_num=1, num_episodes=10, show=show)
@@ -28,8 +28,8 @@ with app.app_context():
     db.session.add(show)
     
     # godfatherSeries = MovieSeries(title="The Godfather Trilogy", descr="One of the most iconic mob movie trilogies of all time", num_movies=3)
-    godfather = Movies(title="The Godfather Pt. 1", descr="An old mafia boss's son gets more involved with his father's business.")
-    godfatherPart2 = Movies(title="The Godfather Pt. 2", descr="Michael Corelone serves as the Don of his crime family.")
+    godfather = Movies(title="The Godfather Pt. 1", descr="An old mafia boss's son gets more involved with his father's business.", picture='the-godfather.svg')
+    godfatherPart2 = Movies(title="The Godfather Pt. 2", descr="Michael Corelone serves as the Don of his crime family.", picture='godfatherpt2.jpg')
     db.session.add(godfather)
     db.session.add(godfatherPart2)
     testuser = Users(username="test", email="test@example.org", password_hash=os.environ['TEST_USER_PASSWORD'])
@@ -41,7 +41,7 @@ with app.app_context():
     loggedEpisodeOne = LoggedContent(user=testuser, content_part_ref=s1e1, status='watched', rating=8.0, user_review='A good start to a GREAT show.')
     loggedEpisodeTwo = LoggedContent(user=testuser, content_part_ref=s1e2, status='watched', rating=9.0, user_review='Yeah... this definitely isn\'t just a show about lawyers.')
     # adding more shows below to test the search functionality
-    deathNote = TvShows(title="Death Note", descr="A bored student finds a book that will kill anyone whose name he writes in it...", num_seasons=1, num_episodes=37)
+    deathNote = TvShows(title="Death Note", descr="A bored student finds a book that will kill anyone whose name he writes in it...", num_seasons=1, num_episodes=37, picture='deathnote.jpg')
     deathNoteEpisode1 = TvEpisodes(title="Rebirth", descr="Light Yagami learns how the Death Note works and decides to use it to rid the world of evil.", episode_num=1, minutes_len=23, season_num=1, show=deathNote)
     deathNoteEpisode2 = TvEpisodes(title="Confrontation", descr="Light learns that his plan isn't going to be as easy as it seems...", episode_num=2, minutes_len=23, season_num=1, show=deathNote)
     mobPsycho100 = TvShows(title="Mob Psycho 100", descr="A student tries to learn to control his incredible psychic powers while exorcising various spirits with the help of a con artist.", num_seasons=1, num_episodes=12, picture="mob.jpg")
