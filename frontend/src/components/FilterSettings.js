@@ -56,7 +56,7 @@ function FilterSettings() {
     <>
       <StatusBoxes>
         <p>Status: </p>
-        {filterBoxes.statusBoxes.map((filterBox, index) => <TextualCheckbox key={filterBox.checkName} {...filterBox} checkHandler={() => handleStatusChange(index)} />)}
+        {filterParams.statusBoxes.map((filterBox, index) => <TextualCheckbox key={filterBox.checkName} {...filterBox} checkHandler={() => handleStatusChange(index)} />)}
       </StatusBoxes>
       {/* <h3>Content types:</h3>
       {filterParams.contentTypes.map(param => <p>{param}</p>)} */}
