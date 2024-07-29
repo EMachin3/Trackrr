@@ -2,7 +2,7 @@
 A website that allows users to track all the media that they have either already consumed or plan to consume across media formats.    
 ## Setup
 1. git clone https://github.com/EMachin3/Trackrr.git
-2. Set up a Postgres database on your local machine (you could also edit the code inapp.py to access a remote database)
+2. Set up a Postgres database on your local machine (you could also edit the code in app.py to access a remote database)
 3. Set the DB\_USERNAME, DB\_PASSWORD, and DB\_NAME environment variables.
 4. While you're at it, set FLASK\_SECRET\_KEY to be something random (I use os.urandom(24) from the Python library). Also, set the TEST\_USER\_PASSWORD to be the bcrypt hash for your password generated using passlib.
 5. cd backend
