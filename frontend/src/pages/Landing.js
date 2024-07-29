@@ -9,9 +9,6 @@ function Landing() {
         <a href="/login">
             <button>Log in</button>
         </a>
-	{/*<input type="checkbox" class="hidden" name="cb" id="cb" />
-<label for="cb">text</label>*/}
-	<FilterSettings />
     </header>
     )
 }

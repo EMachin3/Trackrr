@@ -14,7 +14,7 @@ const filterBoxes = {
             'checked': true,
         },
         {
-            'checkName': 'want_to_watch',
+            'checkName': 'want_to_consume',
             'text': 'Want to Consume',
             'selectedColor': 'purple', //idk which color represents want to watch
             'checked': false,

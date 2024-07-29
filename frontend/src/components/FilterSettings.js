@@ -2,15 +2,15 @@ import "../App.css";
 import { React, useState, useEffect } from "react";
 import styled from 'styled-components';
 import TextualCheckbox from "../components/TextualCheckbox";
-import filterBoxes from "../config/filterBoxes"
+// import filterBoxes from "../config/filterBoxes"
 
-function FilterSettings() {
+function FilterSettings({filterParams, setFilterParams/*, setQueryURL*/}) {
   //const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
   // const [filterParams, setFilterParams] = useState({
   //   contentTypes: [],
   //   statuses: [],
   // });
-  const [filterParams, setFilterParams] = useState(filterBoxes);
+  // const [filterParams, setFilterParams] = useState(filterBoxes);
   const StatusBoxes = styled.div`
     display: flex;
 	  align-items: center;
@@ -50,7 +50,7 @@ function FilterSettings() {
               })
     }*/
     //e.target.checked = e.target.checked ? false : true;
-    console.log(filterParams);
+    // console.log(filterParams);
   }
   return (
     <>
@@ -60,7 +60,7 @@ function FilterSettings() {
       </StatusBoxes>
       {/* <h3>Content types:</h3>
       {filterParams.contentTypes.map(param => <p>{param}</p>)} */}
-      <h3>Statuses:</h3>
+      {/* <h3>Statuses:</h3>
       {filterParams.statusBoxes.map(param => {
         return (
           <>
@@ -70,7 +70,7 @@ function FilterSettings() {
           <p>{param.checked ? "Checked" : "Not checked"}</p>
           </>
         )
-      })}
+      })} */}
     </>
   )
 }
