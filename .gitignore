@@ -3,3 +3,5 @@
 __pycache__
 node_modules
 frontend/src/assets/
+public/
+frontend/src/checkboxes.css
