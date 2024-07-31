@@ -76,8 +76,8 @@ function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
             checkHandler={() => handleContentTypeChange(index)}
           />
         ))}
-        </FilterBoxes>
-        <FilterBoxes>
+      </FilterBoxes>
+      <FilterBoxes>
         <p>Status: </p>
         {filterParams.statusBoxes.map((filterBox, index) => (
           <TextualCheckbox
