@@ -5,18 +5,17 @@ import ContentSearch from "../components/ContentSearch.js";
 import UserLogs from "../components/UserLogs.js";
 
 function Home() {
-    //TODO: do something if you go here but aren't signed in, see commented code on UserLogs
-    //TODO: add a default "no image found" thing
-    return (
-        <>
-            <header className="App-header">
-                <h1>Welcome back. Let's log some content.</h1>
-                <UserLogs />
-                <ContentSearch />
-
-            </header>
-        </>
-    )
+  //TODO: do something if you go here but aren't signed in, see commented code on UserLogs
+  //TODO: add a default "no image found" thing
+  return (
+    <>
+      <header className="App-header">
+        <h1>Welcome back. Let's log some content.</h1>
+        <UserLogs />
+        <ContentSearch />
+      </header>
+    </>
+  );
 }
 
 export default Home;
