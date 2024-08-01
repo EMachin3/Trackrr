@@ -12,7 +12,7 @@ function Home() {
       <header className="App-header">
         <h1>Welcome back. Let's log some content.</h1>
         <UserLogs />
-        {/* <ContentSearch /> This component was here for testing, but it actually belongs within other future components */}
+        <ContentSearch />
       </header>
     </>
   );

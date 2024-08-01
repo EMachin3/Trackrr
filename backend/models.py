@@ -50,6 +50,7 @@ class TvShows(Content):
     # picture: Mapped[Optional[str]]
     num_seasons: Mapped[Optional[int]]
     num_episodes: Mapped[Optional[int]]
+    finished_airing: Mapped[Optional[bool]] #this should only be true if we 100% know the show is over
     # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="show")
     __mapper_args__ = {

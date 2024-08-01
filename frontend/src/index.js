@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import AddContent from "./pages/AddContent";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,14 @@ const router = createBrowserRouter([
     element: (
       <>
         <Home />
+      </>
+    ),
+  },
+  {
+    path: "/add_content",
+    element: (
+      <>
+        <AddContent />
       </>
     ),
   },

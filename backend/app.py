@@ -55,22 +55,41 @@ def logout():
     session.clear()
     return redirect('/test')
 
-@app.route('/api/content', methods=(['GET'])) #TODO: add post and put later
-def get_content():
+@app.route('/api/content', methods=(['GET', 'POST'])) #TODO: add put later
+def content():
     if 'user_id' not in session:
-       return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
-    stmt = db.select(Content.id, Content.content_type, Content.title, Content.descr, Content.picture)
-    if 'content_type' in request.args:
-        stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
-    if 'search_query' in request.args: #TODO this might have to be done with request.form instead i'm not sure how much mileage i can get out of HTML input boxes
-        search = "%{}%".format(request.args['search_query'])
-        content_sort_case = db.case(
-            (Content.title.ilike(search), 1),
-            (Content.descr.ilike(search), 2) #no else because it's an or so one of these has to match. idk if that's an issue though
-        )
-        stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
-    content = db.session.execute(stmt).all()
-    return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content]
+        return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
+    if request.method == 'GET':
+        stmt = db.select(Content.id, Content.content_type, Content.title, Content.descr, Content.picture)
+        if 'content_type' in request.args:
+            stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
+        if 'search_query' in request.args: #TODO this might have to be done with request.form instead i'm not sure how much mileage i can get out of HTML input boxes
+            search = "%{}%".format(request.args['search_query'])
+            content_sort_case = db.case(
+                (Content.title.ilike(search), 1),
+                (Content.descr.ilike(search), 2) #no else because it's an or so one of these has to match. idk if that's an issue though
+            )
+            stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
+        content = db.session.execute(stmt).all()
+        return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content]
+    else: #currently just post, eventually add user groups so only certain people can add content and others can request for something to be added
+        contentData = request.form.to_dict()
+        newContent = None
+        if contentData['content_type'] == 'tv_show':
+            if 'finished_airing' in contentData:
+                contentData['finished_airing'] = True
+            else:
+                contentData['finished_airing'] = False
+            newContent = TvShows(**contentData)
+            #print(newShow)
+            #return jsonify(newShow)
+        else:
+            newContent = Content(**contentData) #TODO: add any other edge cases as new content types get supported
+            #print(newContent)
+            #return jsonify(newContent)
+        db.session.add(newContent)
+        db.session.commit()
+        return redirect('/home')
 
 @app.route('/api/content_parts/<content_id>', methods=(['GET'])) #TODO: add post and put later
 def get_content_parts(content_id):
