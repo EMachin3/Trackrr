@@ -108,27 +108,48 @@ def get_content_parts(content_id):
     content_parts = db.session.execute(stmt).all()
     return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content_parts]
 
-@app.route('/api/logged_content', methods=(['GET'])) #TODO: add post and put later
+@app.route('/api/logged_content', methods=(['GET', 'POST'])) #TODO: add put later
 def get_logged_content():
     #if 'collection' in request.args:
     if 'user_id' not in session:
        return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
-    stmt = db.select(Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
-    if 'status' in request.args:
-        stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
-    stmt = stmt.join(Content, LoggedContent.content_id == Content.id)
-    if 'content_type' in request.args:
-        stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
-    if 'search_query' in request.args: #TODO this might have to be done with request.form instead i'm not sure how much mileage i can get out of HTML input boxes
-        search = "%{}%".format(request.args['search_query'])
-        content_sort_case = db.case(
-            (Content.title.ilike(search), 1),
-            (Content.descr.ilike(search), 2) #no else because it's an or so one of these has to match. idk if that's an issue though
-        )
-        stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
-        # stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search)))
-    content = db.session.execute(stmt).all()
-    return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4], 'picture': x[5]} for x in content]
+    if request.method == 'GET':
+        stmt = db.select(Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
+        if 'status' in request.args:
+            stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
+        stmt = stmt.join(Content, LoggedContent.content_id == Content.id)
+        if 'content_type' in request.args:
+            stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
+        if 'search_query' in request.args: #TODO this might have to be done with request.form instead i'm not sure how much mileage i can get out of HTML input boxes
+            search = "%{}%".format(request.args['search_query'])
+            content_sort_case = db.case(
+                (Content.title.ilike(search), 1),
+                (Content.descr.ilike(search), 2) #no else because it's an or so one of these has to match. idk if that's an issue though
+            )
+            stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
+            # stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search)))
+        content = db.session.execute(stmt).all()
+        return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4], 'picture': x[5]} for x in content]
+    else: #currently just post, TODO needs to be finished
+        logData = request.form.to_dict()
+        user = db.session.execute(db.select(Users).filter_by(user_id=session['user_id']))
+        newLog = None
+        if logData['content_type'] == 'tv_show':
+            if 'finished_airing' in logData:
+                logData['finished_airing'] = True
+            else:
+                logData['finished_airing'] = False
+            newLog = TvShows(**logData)
+            #print(newShow)
+            #return jsonify(newShow)
+        else:
+            newLog = Content(**logData) #TODO: add any other edge cases as new content types get supported
+            #print(newContent)
+            #return jsonify(newContent)
+        db.session.add(newLog)
+        db.session.commit()
+        return redirect('/home')
+        
     
 @app.route('/api/logged_content_parts/<content_id>')
 def get_logged_content_parts(content_id):

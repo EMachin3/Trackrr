@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AddContent from "./pages/AddContent";
+import LogContent from "./pages/LogContent";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,14 @@ const router = createBrowserRouter([
     element: (
       <>
         <AddContent />
+      </>
+    ),
+  },
+  {
+    path: "/log_content",
+    element: (
+      <>
+        <LogContent />
       </>
     ),
   },
