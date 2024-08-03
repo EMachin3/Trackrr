@@ -4,6 +4,7 @@ import styled from "styled-components";
 import TextualCheckbox from "../components/TextualCheckbox";
 // import filterBoxes from "../config/filterBoxes"
 
+//TODO: weird glitch: games won't appear unless you set content types to games and something to the right of games. this is not a backend issue.
 function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
   //const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
   // const [filterParams, setFilterParams] = useState({

@@ -124,6 +124,15 @@ class Movies(Content):
         "polymorphic_identity": "movie",
     }
 
+class Games(Content):
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # title: Mapped[str] = mapped_column(String, unique=True)
+    # descr: Mapped[Optional[str]]
+    # picture: Mapped[Optional[str]]
+    __mapper_args__ = {
+        "polymorphic_identity": "video_game",
+    }
+
 @dataclass
 class Books(db.Model):
     # def __init__(self, title, author, pages_num, review = None):

@@ -56,7 +56,7 @@ function ContentSearch({ setSelectedContent }) {
 
   function handleSelect(e) {
     e.preventDefault();
-    setSelectedContent(fetchedData[e.target.id])
+    setSelectedContent(fetchedData[e.target.id]);
   }
 
   //console.log(data)
@@ -108,6 +108,12 @@ function ContentSearch({ setSelectedContent }) {
               />
             );
           })}
+        {/* This should ideally be in the previous block but for some reason it doesn't work */}
+        {fetchedData && (
+          <p>
+            Don't see what you want? <a href="/add_content">Add it manually.</a>
+          </p>
+        )}
       </>
     );
   }

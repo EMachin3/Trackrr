@@ -35,7 +35,9 @@ function SelectContentBox({ title, image, image_height, handleSelect, index }) {
         src={process.env.PUBLIC_URL + `/content_photos/${image}`}
       ></ContentImage>
       <ContentTitle>{title}</ContentTitle>
-      <SelectButton id={index} onClick={(e) => handleSelect(e)}>Select</SelectButton>
+      <SelectButton id={index} onClick={(e) => handleSelect(e)}>
+        Select
+      </SelectButton>
     </ContentContainer>
   );
 }

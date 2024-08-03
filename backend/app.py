@@ -132,21 +132,21 @@ def get_logged_content():
         return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4], 'picture': x[5]} for x in content]
     else: #currently just post, TODO needs to be finished
         logData = request.form.to_dict()
-        user = db.session.execute(db.select(Users).filter_by(user_id=session['user_id']))
-        newLog = None
-        if logData['content_type'] == 'tv_show':
-            if 'finished_airing' in logData:
-                logData['finished_airing'] = True
-            else:
-                logData['finished_airing'] = False
-            newLog = TvShows(**logData)
-            #print(newShow)
-            #return jsonify(newShow)
-        else:
-            newLog = Content(**logData) #TODO: add any other edge cases as new content types get supported
-            #print(newContent)
-            #return jsonify(newContent)
-        db.session.add(newLog)
+        # user = db.session.execute(db.select(Users).filter_by(user_id=session['user_id']))
+        # newLog = None
+        # if logData['content_type'] == 'tv_show':
+        #     if 'finished_airing' in logData:
+        #         logData['finished_airing'] = True
+        #     else:
+        #         logData['finished_airing'] = False
+        #     newLog = TvShows(**logData)
+        #     #print(newShow)
+        #     #return jsonify(newShow)
+        # else:
+        #     newLog = Content(**logData) #TODO: add any other edge cases as new content types get supported
+        #     #print(newContent)
+        #     #return jsonify(newContent)
+        db.session.add(LoggedContent(**logData, user_id=session['user_id']))
         db.session.commit()
         return redirect('/home')
         
