@@ -20,6 +20,7 @@ function AddContentForm() {
       title: e.target.title.value,
       descr: e.target.descr.value,
       picture: e.target.picture.value,
+      minutes_len: e.target.minutes_len.value,
     });
     setTvSeasons(tvSeasons);
     setAddingEpisodeSeason(null);
@@ -29,9 +30,17 @@ function AddContentForm() {
 
   return (
     <div>
-      <form action="/api/content" class="form-example">
+      <form action="/api/content" method="post" class="form-example">
         {" "}
         {/*target="dummyframe"*/}
+        <div class="form-example">
+          <input
+            type="hidden"
+            name="content_parts"
+            id="content_parts"
+            value={JSON.stringify(tvSeasons)}
+          />
+        </div>
         <div class="form-example">
           <label for="content_type">Content type: </label>
           <select
@@ -63,14 +72,23 @@ function AddContentForm() {
           <>
             <div class="form-example">
               <label for="num_seasons">Number of seasons: </label>
-              <input type="text" name="num_seasons" id="num_seasons" required />
+              <input
+                type="number"
+                name="num_seasons"
+                id="num_seasons"
+                min="0"
+                step="1"
+                required
+              />
             </div>
             <div class="form-example">
               <label for="num_episodes">Number of episodes: </label>
               <input
-                type="text"
+                type="number"
                 name="num_episodes"
                 id="num_episodes"
+                min="0"
+                step="1"
                 required
               />
             </div>

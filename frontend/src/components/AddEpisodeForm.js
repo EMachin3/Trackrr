@@ -23,6 +23,16 @@ function AddEpisodeForm({ season_index, handleSubmit }) {
           <input type="text" name="descr" id="descr" />
         </div>
         <div class="form-example">
+          <label for="minutes_len">Episode Length (minutes): </label>
+          <input
+            type="number"
+            name="minutes_len"
+            id="minutes_len"
+            min="0"
+            required
+          />
+        </div>
+        <div class="form-example">
           <label for="picture">Picture (optional): </label>
           <input type="file" name="picture" id="picture" />
         </div>

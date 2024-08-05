@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, redirect, session, flash, g
 from sqlalchemy import or_, func
-import os
+import os, json
 from passlib.hash import bcrypt
 from database import db
 from models import *
@@ -74,19 +74,31 @@ def content():
         return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content]
     else: #currently just post, eventually add user groups so only certain people can add content and others can request for something to be added
         contentData = request.form.to_dict()
+        #TODO this line is for testing, remove it
+        #print(contentData['content_parts'])
         newContent = None
         if contentData['content_type'] == 'tv_show':
-            if 'finished_airing' in contentData:
-                contentData['finished_airing'] = True
-            else:
-                contentData['finished_airing'] = False
+            # if 'finished_airing' in contentData:
+            #     contentData['finished_airing'] = True
+            # else:
+            #     contentData['finished_airing'] = False
+            contentData['finished_airing'] = 'finished_airing' in contentData
+            seasons = json.loads(contentData['content_parts'])
+            del contentData['content_parts']
             newContent = TvShows(**contentData)
+            for (season_index, season) in enumerate(seasons):
+                for (episode_index, episode) in enumerate(season):
+                    TvEpisodes(**episode, season_num=season_index+1, episode_num=episode_index+1, show=newContent)
             #print(newShow)
             #return jsonify(newShow)
+            # db.session.add(newContent)
+            # db.session.commit()
         else:
             newContent = Content(**contentData) #TODO: add any other edge cases as new content types get supported
             #print(newContent)
             #return jsonify(newContent)
+            # db.session.add(newContent)
+            # db.session.commit()
         db.session.add(newContent)
         db.session.commit()
         return redirect('/home')
