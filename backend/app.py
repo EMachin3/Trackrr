@@ -60,7 +60,7 @@ def content():
     if 'user_id' not in session:
         return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
     if request.method == 'GET':
-        stmt = db.select(Content.id, Content.content_type, Content.title, Content.descr, Content.picture)
+        stmt = db.select(Content.id, Content.content_type, Content.title, Content.descr, Content.picture, Content.num_seasons, Content.num_episodes)
         if 'content_type' in request.args:
             stmt = stmt.filter(Content.content_type.in_(request.args.get('content_type').split(',')))
         if 'search_query' in request.args: #TODO this might have to be done with request.form instead i'm not sure how much mileage i can get out of HTML input boxes
@@ -71,7 +71,7 @@ def content():
             )
             stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
         content = db.session.execute(stmt).all()
-        return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content]
+        return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4], 'num_seasons': x[5], 'num_episodes': x[6]} for x in content]
     else: #currently just post, eventually add user groups so only certain people can add content and others can request for something to be added
         contentData = request.form.to_dict()
         #TODO this line is for testing, remove it
@@ -102,6 +102,18 @@ def content():
         db.session.add(newContent)
         db.session.commit()
         return redirect('/home')
+
+@app.route('/api/content/<content_id>/count_season_parts/<season_num>')
+def season_num_parts(content_id, season_num):
+    if 'user_id' not in session:
+        return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
+    def get_count(q):
+        count_q = q.with_only_columns(func.count()).order_by(None)
+        count = db.session.execute(count_q).scalar()
+        return count
+    q = db.select(ContentPart).filter_by(content_id=content_id, season_num=season_num)
+    # print(f"Count: {get_count(q)}")
+    return str(get_count(q))
 
 @app.route('/api/content_parts/<content_id>', methods=(['GET'])) #TODO: add post and put later
 def get_content_parts(content_id):
@@ -158,7 +170,38 @@ def get_logged_content():
         #     newLog = Content(**logData) #TODO: add any other edge cases as new content types get supported
         #     #print(newContent)
         #     #return jsonify(newContent)
-        db.session.add(LoggedContent(**logData, user_id=session['user_id']))
+        contentType = logData['content_type']
+        numSeasons = logData['content_num_seasons']
+        contentID = logData['content_id']
+        status = logData['status']
+        currSeasonNum = logData['curr_season']
+        currEpisodeNum = logData['curr_episode']
+        del logData['content_type']
+        del logData['content_num_seasons']
+        del logData['content_id']
+        del logData['status']
+        del logData['curr_season']
+        del logData['curr_episode']
+        if contentType == 'tv_show':
+            if status == 'completed': #TODO not sure if want_to_consume should be here
+                for season_num in range(1, numSeasons + 1):
+                    for episode_num in range(1, int(season_num_parts(contentID, season_num))):
+                        #need to get the ID of the content part corresponding to the season and episode numbers
+                        currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=season_num, episode_num=episode_num)).scalar_one_or_none()
+                        if currPart:
+                            db.session.add(LoggedContent(**logData, status=status, content_part_ref=currPart, user_id=session['user_id']))
+                        else:
+                            continue #TODO decide what the best way is to handle a situation where not all the episodes are logged
+            elif status != 'want_to_consume':
+                for season_num in range(1, currSeasonNum): #populate every season before current season with completed logs
+                    for episode_num in range(1, int(season_num_parts(contentID, season_num))):
+                        #need to get the ID of the content part corresponding to the season and episode numbers
+                        currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=season_num, episode_num=episode_num)).scalar_one_or_none()
+                        if currPart:
+                            db.session.add(LoggedContent(**logData, status=status, content_part_ref=currPart, user_id=session['user_id']))
+                        else:
+                            continue
+        db.session.add(LoggedContent(**logData, status=status, content_id=contentID, user_id=session['user_id']))
         db.session.commit()
         return redirect('/home')
         

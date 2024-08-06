@@ -25,6 +25,8 @@ function LogContent() {
                 contentType={selectedContent.content_type}
                 contentTitle={selectedContent.title}
                 contentDescription={selectedContent.description}
+                contentNumSeasons={selectedContent.num_seasons}
+                // contentNumEpisodes={selectedContent.num_episodes}
               />
             </>
           )}
