@@ -13,8 +13,10 @@ function UserLogs() {
   const navigate = useNavigate();
   useEffect(() => {
     //fetch("/api/logged_content?status=in_progress").then((res) =>
+    const params = new URLSearchParams({ status: filterParams.statusBoxes.filter((filterBox) => filterBox.checked).map((filterBox) => filterBox.checkName), content_type: filterParams.contentTypes.filter((contentType) => contentType.checked).map((contentType) => contentType.checkName) });
+    //console.log(params);
     fetch(
-      `/api/logged_content?${new URLSearchParams({ status: filterParams.statusBoxes.filter((filterBox) => filterBox.checked).map((filterBox) => filterBox.checkName), content_type: filterParams.contentTypes.filter((contentType) => contentType.checked).map((contentType) => contentType.checkName) })})}`,
+      `/api/logged_content?${params}`,
     ).then((res) =>
       res.json().then((data) => {
         // Setting a data from api

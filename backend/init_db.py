@@ -35,10 +35,11 @@ with app.app_context():
     db.session.add(godfatherPart2)
     testuser = Users(username="test", email="test@example.org", password_hash=os.environ['TEST_USER_PASSWORD'])
     # db.session.add(testuser)
-    loggedShow = LoggedContent(user=testuser, content_ref=show, status='completed', rating=9.5, user_review='A deserving successor to Breaking Bad that keeps getting better and better.')
     # loggedMovieSeries = LoggedContent(user=testuser, content_ref=godfatherSeries, status='in_progress')
     loggedMovieOne = LoggedContent(user=testuser, content_ref=godfather, status='completed', rating=10.0, user_review='An all-time classic')
     loggedMovieTwo = LoggedContent(user=testuser, content_ref=godfatherPart2, status='want_to_consume')
+    
+    loggedShow = LoggedContent(user=testuser, content_ref=show, status='completed', rating=9.5, user_review='A deserving successor to Breaking Bad that keeps getting better and better.')
     loggedEpisodeOne = LoggedContent(user=testuser, content_part_ref=s1e1, status='completed', rating=8.0, user_review='A good start to a GREAT show.')
     loggedEpisodeTwo = LoggedContent(user=testuser, content_part_ref=s1e2, status='completed', rating=9.0, user_review='Yeah... this definitely isn\'t just a show about lawyers.')
     # adding more shows below to test the search functionality

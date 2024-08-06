@@ -4,7 +4,7 @@ import styled from "styled-components";
 import TextualCheckbox from "../components/TextualCheckbox";
 // import filterBoxes from "../config/filterBoxes"
 
-//TODO: weird glitch: games won't appear unless you set content types to games and something to the right of games. this is not a backend issue.
+//TODO: each click on a filter causes a TON of re-renders.
 function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
   //const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
   // const [filterParams, setFilterParams] = useState({
@@ -37,6 +37,7 @@ function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
       }),
       statusBoxes: filterParams.statusBoxes,
     });
+    //console.log(filterParams)
   }
   function handleStatusChange(index) {
     setFilterParams({
@@ -47,6 +48,7 @@ function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
           : filterBox;
       }),
     });
+    //console.log(filterParams)
     //const { value, checked } = e.target;
     //console.log(`${value} is ${checked}`);
     /*if (checked) {

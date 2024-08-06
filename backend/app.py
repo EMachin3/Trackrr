@@ -155,6 +155,7 @@ def get_logged_content():
         content = db.session.execute(stmt).all()
         return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4], 'picture': x[5]} for x in content]
     else: #currently just post, TODO needs to be finished
+        #TODO possibly handle case where you log something that's already been logged
         logData = request.form.to_dict()
         # user = db.session.execute(db.select(Users).filter_by(user_id=session['user_id']))
         # newLog = None
@@ -171,21 +172,26 @@ def get_logged_content():
         #     #print(newContent)
         #     #return jsonify(newContent)
         contentType = logData['content_type']
-        numSeasons = logData['content_num_seasons']
-        contentID = logData['content_id']
+        numSeasons = int(logData['content_num_seasons'])
+        contentID = int(logData['content_id'])
         status = logData['status']
-        currSeasonNum = logData['curr_season']
-        currEpisodeNum = logData['curr_episode']
+        # currSeasonNum = int(logData['curr_season'])
+        # currEpisodeNum = int(logData['curr_episode'])
+        rating = logData['rating']
+        userReview = logData['user_review']
+        #TODO: maybe just get rid of splat operator in this function at this point
         del logData['content_type']
         del logData['content_num_seasons']
         del logData['content_id']
         del logData['status']
-        del logData['curr_season']
-        del logData['curr_episode']
+        # del logData['curr_season']
+        # del logData['curr_episode']
+        del logData['rating']
+        del logData['user_review']
         if contentType == 'tv_show':
             if status == 'completed': #TODO not sure if want_to_consume should be here
                 for season_num in range(1, numSeasons + 1):
-                    for episode_num in range(1, int(season_num_parts(contentID, season_num))):
+                    for episode_num in range(1, int(season_num_parts(contentID, season_num)) + 1): # go through all of the episodes including the last
                         #need to get the ID of the content part corresponding to the season and episode numbers
                         currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=season_num, episode_num=episode_num)).scalar_one_or_none()
                         if currPart:
@@ -193,15 +199,30 @@ def get_logged_content():
                         else:
                             continue #TODO decide what the best way is to handle a situation where not all the episodes are logged
             elif status != 'want_to_consume':
+                currSeasonNum = int(logData['curr_season'])
+                currEpisodeNum = int(logData['curr_episode'])
+                del logData['curr_season']
+                del logData['curr_episode']
                 for season_num in range(1, currSeasonNum): #populate every season before current season with completed logs
-                    for episode_num in range(1, int(season_num_parts(contentID, season_num))):
+                    for episode_num in range(1, int(season_num_parts(contentID, season_num)) + 1):
                         #need to get the ID of the content part corresponding to the season and episode numbers
                         currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=season_num, episode_num=episode_num)).scalar_one_or_none()
                         if currPart:
-                            db.session.add(LoggedContent(**logData, status=status, content_part_ref=currPart, user_id=session['user_id']))
+                            db.session.add(LoggedContent(**logData, status='completed', content_part_ref=currPart, user_id=session['user_id']))
                         else:
                             continue
-        db.session.add(LoggedContent(**logData, status=status, content_id=contentID, user_id=session['user_id']))
+                #now log episodes in the current season as completed
+                for episode_num in range(1, currEpisodeNum):
+                    currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=currSeasonNum, episode_num=episode_num)).scalar_one_or_none()
+                    if currPart:
+                        db.session.add(LoggedContent(**logData, status='completed', content_part_ref=currPart, user_id=session['user_id']))
+                    else:
+                        continue
+                #now log the current episode as in progress (TODO see if this is the best approach)
+                currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=currSeasonNum, episode_num=currEpisodeNum)).scalar_one_or_none()
+                if currPart:
+                    db.session.add(LoggedContent(**logData, status='in_progress', content_part_ref=currPart, user_id=session['user_id']))
+        db.session.add(LoggedContent(**logData, status=status, content_id=contentID, rating=rating, user_review=userReview, user_id=session['user_id']))
         db.session.commit()
         return redirect('/home')
         
