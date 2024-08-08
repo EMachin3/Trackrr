@@ -16,10 +16,8 @@ function UserLogs() {
   useEffect(() => {
     //fetch("/api/logged_content?status=in_progress").then((res) =>
     const params = new URLSearchParams({ status: filterParams.statusBoxes.filter((filterBox) => filterBox.checked).map((filterBox) => filterBox.checkName), content_type: filterParams.contentTypes.filter((contentType) => contentType.checked).map((contentType) => contentType.checkName) });
-    if (keywords !== null) {
-      if (keywords !== "") {
-        params.append('search_query', keywords);
-      }
+    if (keywords !== null && keywords !== "") {
+      params.append('search_query', keywords);
     }
     //console.log(params);
     fetch(
