@@ -19,6 +19,8 @@ class ContentPart(db.Model):
     picture: Mapped[Optional[str]]
     logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_part_ref")
     content_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content.id"))
+    season_num: Mapped[Optional[int]] #this being optional is not ideal but the other case forces other children to be not null for some reason
+    episode_num: Mapped[Optional[int]]
     #todo: maybe store info about amount of people who have it logged?
     __mapper_args__ = {
         "polymorphic_on": "content_type",
@@ -36,6 +38,9 @@ class Content(db.Model):
     title: Mapped[str] = mapped_column(String, unique=True)
     descr: Mapped[Optional[str]]
     picture: Mapped[Optional[str]]
+    num_seasons: Mapped[Optional[int]]
+    num_episodes: Mapped[Optional[int]]
+    #seasons_epcounts: Mapped[Optional[List[int]]]
     logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
     __mapper_args__ = {
         "polymorphic_on": "content_type",
@@ -48,8 +53,8 @@ class TvShows(Content):
     # title: Mapped[str] = mapped_column(String, unique=True)
     # descr: Mapped[Optional[str]]
     # picture: Mapped[Optional[str]]
-    num_seasons: Mapped[Optional[int]]
-    num_episodes: Mapped[Optional[int]]
+    #num_seasons: Mapped[Optional[int]] had to move this to content because reasons
+    #num_episodes: Mapped[Optional[int]]
     finished_airing: Mapped[Optional[bool]] #this should only be true if we 100% know the show is over
     # seasons: Mapped[List["TvSeasons"]] = relationship("TvSeasons", backref="show")
     episodes: Mapped[List["TvEpisodes"]] = relationship("TvEpisodes", backref="show")
@@ -79,8 +84,8 @@ class TvEpisodes(ContentPart):
     # picture: Mapped[Optional[str]]
     # logs: Mapped[List["LoggedContent"]] = relationship("LoggedContent", backref="content_ref")
     # collection_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("content_collection.id"))
-    season_num: Mapped[Optional[int]] #this being optional is not ideal but the other case forces other children to be not null for some reason
-    episode_num: Mapped[Optional[int]]
+    # season_num: Mapped[Optional[int]] #this being optional is not ideal but the other case forces other children to be not null for some reason
+    # episode_num: Mapped[Optional[int]]
     minutes_len: Mapped[Optional[int]]
     # season_id: Mapped[int] = mapped_column(Integer, ForeignKey("tv_seasons.id"))
     # season: Mapped[TvSeasons] = relationship("TvSeasons", back_populates="episodes")
@@ -122,6 +127,15 @@ class Movies(Content):
     # picture: Mapped[Optional[str]]
     __mapper_args__ = {
         "polymorphic_identity": "movie",
+    }
+
+class Games(Content):
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # title: Mapped[str] = mapped_column(String, unique=True)
+    # descr: Mapped[Optional[str]]
+    # picture: Mapped[Optional[str]]
+    __mapper_args__ = {
+        "polymorphic_identity": "video_game",
     }
 
 @dataclass

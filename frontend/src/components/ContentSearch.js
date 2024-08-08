@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import { React, useState /*, useEffect*/ } from "react";
 import { useNavigate } from "react-router-dom";
-import ContentBox from "./ContentBox";
+import SelectContentBox from "./SelectContentBox";
 
 const SearchWrapper = styled.div`
   display: flex;
@@ -24,7 +24,7 @@ const SearchButton = styled.button`
   outline: none;
 `;
 
-function ContentSearch() {
+function ContentSearch({ setSelectedContent }) {
   const [keywords, setKeywords] = useState("");
   const [fetchedData, setFetchedData] = useState();
   const navigate = useNavigate();
@@ -54,6 +54,11 @@ function ContentSearch() {
     // fetchData(formJson);
   }
 
+  function handleSelect(e) {
+    e.preventDefault();
+    setSelectedContent(fetchedData[e.target.id]);
+  }
+
   //console.log(data)
   if (fetchedData === undefined) {
     return (
@@ -61,7 +66,7 @@ function ContentSearch() {
         <SearchWrapper>
           <SearchEntry
             name="search"
-            placeholder="Search"
+            placeholder="Search for content"
             value={keywords}
             onChange={(e) => setKeywords(e.target.value)}
           />
@@ -94,13 +99,21 @@ function ContentSearch() {
         {fetchedData &&
           fetchedData.map((datum, index) => {
             return (
-              <ContentBox
+              <SelectContentBox
+                index={index}
+                handleSelect={handleSelect}
                 image_height={100}
                 title={datum.title}
                 image={datum.picture}
               />
             );
           })}
+        {/* This should ideally be in the previous block but for some reason it doesn't work */}
+        {fetchedData && (
+          <p>
+            Don't see what you want? <a href="/add_content">Add it manually.</a>
+          </p>
+        )}
       </>
     );
   }

@@ -1,0 +1,13 @@
+how would logging content work?
+1. search content database for content that hasn't been logged?? [What if user searches for something they've already logged].
+	idea: use case order to put unlogged stuff first and logged second and also label if you've logged it already.
+2. Click on the content box that you want to add to your collection of logged content
+	https://stackoverflow.com/questions/56980258/how-to-know-which-button-is-clicked-when-there-are-multiple-buttons-react [this will also probably be useful for later components]
+	Idea: set the ID of each content box to be the serial id of the content in the database. give each button an onclick that sets the state of a passed down useState variable to be the content's ID. the state variable should default to null, so that once it's not null the form renders instead of the search bar.
+3. Rerender the page to have a form for logging the selected piece of content. Get information about that piece of content from the database and use that to populate some pre-filled information about the show so that the user knows that they are logging what they want to log.
+	Form fields:
+		Status (dropdown)
+		Rating (<input type="number" min="0" max="10" step="0.1">)
+                Review (optional)
+                Playtime (field conditional on content type being game)
+		https://www.w3schools.com/tags/att_input_type_number.asp
