@@ -112,6 +112,8 @@ class LoggedContent(db.Model):
     status: Mapped[str] # options: want_to_consume, consuming, finished, dropped. (probably could and should support want to watch/play/listen differentation)
     rating: Mapped[Optional[float]] #decimal from 0.0 to 10 in 0.1 increments
     user_review: Mapped[Optional[str]]
+    curr_season: Mapped[Optional[int]] #TODO: add to init_db.py
+    curr_episode: Mapped[Optional[int]] #TODO: add to init_db.py
     playtime: Mapped[Optional[int]]
     #kinda want to subclass for playtime but also that would be repeating the content_type field
     #from content which we already have a foreign key for so probably not a good idea

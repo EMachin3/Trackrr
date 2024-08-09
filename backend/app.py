@@ -138,7 +138,7 @@ def get_logged_content():
     if 'user_id' not in session:
        return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
     if request.method == 'GET':
-        stmt = db.select(Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
+        stmt = db.select(Content.id, Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, LoggedContent.curr_season, LoggedContent.curr_episode, LoggedContent.playtime, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
         if 'status' in request.args:
             stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
         stmt = stmt.join(Content, LoggedContent.content_id == Content.id)
@@ -153,7 +153,7 @@ def get_logged_content():
             stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
             # stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search)))
         content = db.session.execute(stmt).all()
-        return [{'title': x[0], 'type': x[1], 'status': x[2], 'rating': x[3], 'user_review': x[4], 'picture': x[5]} for x in content]
+        return [{'id': x[0], 'title': x[1], 'type': x[2], 'status': x[3], 'rating': x[4], 'user_review': x[5], 'curr_season': x[6], 'curr_episode': x[7], 'playtime': x[8], 'picture': x[9]} for x in content]
     else: #currently just post, TODO needs to be finished
         #TODO possibly handle case where you log something that's already been logged
         logData = request.form.to_dict()
@@ -172,37 +172,45 @@ def get_logged_content():
         #     #print(newContent)
         #     #return jsonify(newContent)
         contentType = logData['content_type']
-        numSeasons = int(logData['content_num_seasons'])
+        del logData['content_type']
+        #numSeasons = int(logData['content_num_seasons'])
         contentID = int(logData['content_id'])
         status = logData['status']
         # currSeasonNum = int(logData['curr_season'])
         # currEpisodeNum = int(logData['curr_episode'])
         rating = logData['rating']
         userReview = logData['user_review']
+        currSeasonNum = int(logData['curr_season']) if 'curr_season' in logData else None #this honestly could be a better approach for everything else
+        currEpisodeNum = int(logData['curr_episode']) if 'curr_episode' in logData else None
+        del logData['curr_season']
+        del logData['curr_episode']
         #TODO: maybe just get rid of splat operator in this function at this point
-        del logData['content_type']
-        del logData['content_num_seasons']
+        #del logData['content_type']
+        #del logData['content_num_seasons']
         del logData['content_id']
         del logData['status']
-        # del logData['curr_season']
-        # del logData['curr_episode']
+        #del logData['curr_season']
+        #del logData['curr_episode']
         del logData['rating']
         del logData['user_review']
         if contentType == 'tv_show':
+            #status = logData['status']
+            numSeasons = int(logData['content_num_seasons'])
+            del logData['content_num_seasons']
             if status == 'completed': #TODO not sure if want_to_consume should be here
                 for season_num in range(1, numSeasons + 1):
                     for episode_num in range(1, int(season_num_parts(contentID, season_num)) + 1): # go through all of the episodes including the last
                         #need to get the ID of the content part corresponding to the season and episode numbers
                         currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=season_num, episode_num=episode_num)).scalar_one_or_none()
                         if currPart:
-                            db.session.add(LoggedContent(**logData, status=status, content_part_ref=currPart, user_id=session['user_id']))
+                            db.session.add(LoggedContent(**logData, content_part_ref=currPart, user_id=session['user_id']))
                         else:
                             continue #TODO decide what the best way is to handle a situation where not all the episodes are logged
             elif status != 'want_to_consume':
-                currSeasonNum = int(logData['curr_season'])
-                currEpisodeNum = int(logData['curr_episode'])
-                del logData['curr_season']
-                del logData['curr_episode']
+                #currSeasonNum = int(logData['curr_season'])
+                #currEpisodeNum = int(logData['curr_episode'])
+                #del logData['curr_season']
+                #del logData['curr_episode']
                 for season_num in range(1, currSeasonNum): #populate every season before current season with completed logs
                     for episode_num in range(1, int(season_num_parts(contentID, season_num)) + 1):
                         #need to get the ID of the content part corresponding to the season and episode numbers
@@ -222,7 +230,7 @@ def get_logged_content():
                 currPart = db.session.execute(db.select(ContentPart).filter_by(content_id=contentID, season_num=currSeasonNum, episode_num=currEpisodeNum)).scalar_one_or_none()
                 if currPart:
                     db.session.add(LoggedContent(**logData, status='in_progress', content_part_ref=currPart, user_id=session['user_id']))
-        db.session.add(LoggedContent(**logData, status=status, content_id=contentID, rating=rating, user_review=userReview, user_id=session['user_id']))
+        db.session.add(LoggedContent(**logData, rating=rating, user_review=userReview, status=status, curr_season=currSeasonNum, curr_episode=currEpisodeNum, content_id=contentID, user_id=session['user_id']))
         db.session.commit()
         return redirect('/home')
         

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-function LogContentForm({
+function UpdateContentForm({
   contentID,
   contentType,
   contentTitle,
   contentDescription,
   contentNumSeasons,
+  currentContentStatus,
+  currentContentRating,
+  currentContentReview,
+  currentContentPlaytime,
 }) {
-  const [contentStatus, setContentStatus] = useState("completed");
+  const [contentStatus, setContentStatus] = useState(currentContentStatus);
   const [seasonNum, setSeasonNum] = useState(1);
   const [seasonNumEpisodes, setSeasonNumEpisodes] = useState(null);
 
@@ -24,7 +28,7 @@ function LogContentForm({
   //TODO: add props for pre-populated fields from fetch in parent
   // const [selectedContentType, setSelectedContentType] = useState("tv_show");
   return (
-    <form action="/api/logged_content" method="post" class="form-example">
+    <form action="/api/logged_content" method="put" class="form-example">
       {" "}
       <div class="form-example">
         <input
@@ -136,4 +140,4 @@ function LogContentForm({
   );
 }
 
-export default LogContentForm;
+export default UpdateContentForm;

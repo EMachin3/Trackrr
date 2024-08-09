@@ -33,14 +33,16 @@ function AddContentForm() {
       <form action="/api/content" method="post" class="form-example">
         {" "}
         {/*target="dummyframe"*/}
-        <div class="form-example">
-          <input
-            type="hidden"
-            name="content_parts"
-            id="content_parts"
-            value={JSON.stringify(tvSeasons)}
-          />
-        </div>
+        {selectedContentType === "tv_show" && (
+          <div class="form-example">
+            <input
+              type="hidden"
+              name="content_parts"
+              id="content_parts"
+              value={JSON.stringify(tvSeasons)}
+            />
+          </div>
+        )}
         <div class="form-example">
           <label for="content_type">Content type: </label>
           <select
@@ -107,11 +109,12 @@ function AddContentForm() {
         <div class="form-example">
           <input type="submit" value="Add Content" />
         </div>
-        {selectedContentType && (
+        {selectedContentType === "tv_show" && (
           <button onClick={(e) => addSeason(e)}>Add Season</button>
         )}
       </form>
-      {tvSeasons &&
+      {selectedContentType === "tv_show" &&
+        tvSeasons &&
         tvSeasons.map((season, season_index) => {
           return (
             <>
@@ -130,10 +133,9 @@ function AddContentForm() {
                   />
                 );
               })}
-              {addingEpisodeSeason != null &&
-                addingEpisodeSeason === season_index && (
-                  <AddEpisodeForm handleSubmit={(e) => addEpisode(e)} />
-                )}
+              {addingEpisodeSeason === season_index && (
+                <AddEpisodeForm handleSubmit={(e) => addEpisode(e)} />
+              )}
             </>
           );
         })}

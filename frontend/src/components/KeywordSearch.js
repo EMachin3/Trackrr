@@ -23,7 +23,6 @@ const SearchButton = styled.button`
 `;
 
 function KeywordSearch({ setKeywords }) {
-
   function handleSubmit(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
@@ -33,10 +32,7 @@ function KeywordSearch({ setKeywords }) {
   return (
     <form style={{ marginBottom: "20px" }} onSubmit={handleSubmit}>
       <SearchWrapper>
-        <SearchEntry
-          name="search"
-          placeholder="Search for logs"
-        />
+        <SearchEntry name="search" placeholder="Search for logs" />
         <SearchButton type="submit">
           <FaSearch size={31} />
         </SearchButton>
