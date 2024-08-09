@@ -132,13 +132,13 @@ def get_content_parts(content_id):
     content_parts = db.session.execute(stmt).all()
     return [{'id': x[0], 'content_type': x[1], 'title': x[2], 'description': x[3], 'picture': x[4]} for x in content_parts]
 
-@app.route('/api/logged_content', methods=(['GET', 'POST'])) #TODO: add put later
+@app.route('/api/logged_content', methods=(['GET', 'POST', 'PUT']))
 def get_logged_content():
     #if 'collection' in request.args:
     if 'user_id' not in session:
        return {'error': 'not signed in, please sign in by posting username and password to /api/login'}
     if request.method == 'GET':
-        stmt = db.select(Content.id, Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, LoggedContent.curr_season, LoggedContent.curr_episode, LoggedContent.playtime, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
+        stmt = db.select(Content.id, Content.title, Content.content_type, LoggedContent.status, LoggedContent.rating, LoggedContent.user_review, Content.num_seasons, LoggedContent.curr_season, LoggedContent.curr_episode, LoggedContent.playtime, Content.picture).select_from(LoggedContent).filter_by(user_id=session['user_id'])
         if 'status' in request.args:
             stmt = stmt.filter(LoggedContent.status.in_(request.args.get('status').split(',')))
         stmt = stmt.join(Content, LoggedContent.content_id == Content.id)
@@ -153,8 +153,8 @@ def get_logged_content():
             stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search))).order_by(content_sort_case)
             # stmt = stmt.filter(or_(Content.title.ilike(search), Content.descr.ilike(search)))
         content = db.session.execute(stmt).all()
-        return [{'id': x[0], 'title': x[1], 'type': x[2], 'status': x[3], 'rating': x[4], 'user_review': x[5], 'curr_season': x[6], 'curr_episode': x[7], 'playtime': x[8], 'picture': x[9]} for x in content]
-    else: #currently just post, TODO needs to be finished
+        return [{'id': x[0], 'title': x[1], 'type': x[2], 'status': x[3], 'rating': x[4], 'user_review': x[5], 'num_seasons': x[6], 'curr_season': x[7], 'curr_episode': x[8], 'playtime': x[9], 'picture': x[10]} for x in content]
+    elif request.method == 'POST':
         #TODO possibly handle case where you log something that's already been logged
         logData = request.form.to_dict()
         # user = db.session.execute(db.select(Users).filter_by(user_id=session['user_id']))
@@ -181,7 +181,7 @@ def get_logged_content():
         rating = logData['rating']
         userReview = logData['user_review']
         currSeasonNum = int(logData['curr_season']) if 'curr_season' in logData else None #this honestly could be a better approach for everything else
-        currEpisodeNum = int(logData['curr_episode']) if 'curr_episode' in logData else None
+        currEpisodeNum = int(logData['curr_episode']) if 'curr_episode' in logData else None #wish i could use .get but the cast complicates things
         del logData['curr_season']
         del logData['curr_episode']
         #TODO: maybe just get rid of splat operator in this function at this point
@@ -233,6 +233,21 @@ def get_logged_content():
         db.session.add(LoggedContent(**logData, rating=rating, user_review=userReview, status=status, curr_season=currSeasonNum, curr_episode=currEpisodeNum, content_id=contentID, user_id=session['user_id']))
         db.session.commit()
         return redirect('/home')
+    else: # PUT
+        logData = request.form.to_dict()
+        log = db.session.execute(db.select(LoggedContent).filter_by(content_id=logData['content_id'])).scalar_one() # probably should exception if it fails
+        log.status = logData.get('status')
+        if logData['rating'] != None and logData['rating'] != "":
+            log.rating = logData['rating']
+        log.user_review = logData.get('user_review')
+        log.curr_season = logData.get('curr_season')
+        log.curr_episode = logData.get('curr_episode')
+        log.playtime = logData.get('playtime')
+        # log = db.session.get(LoggedContent, logData['content_id'])
+        # print(log)
+        db.session.commit()
+        # TODO: return something slightly more meaningful
+        return {"info": "I haven't decided how I am going to deal with the return value yet..."}
         
     
 @app.route('/api/logged_content_parts/<content_id>')

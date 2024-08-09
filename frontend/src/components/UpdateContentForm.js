@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { /*createSearchParams,*/ useNavigate } from "react-router-dom";
 
 function UpdateContentForm({
   contentID,
@@ -9,8 +10,13 @@ function UpdateContentForm({
   currentContentStatus,
   currentContentRating,
   currentContentReview,
+  currentSeason,
+  currentEpisode,
   currentContentPlaytime,
+  setSelectedLog,
 }) {
+  const navigate = useNavigate();
+
   const [contentStatus, setContentStatus] = useState(currentContentStatus);
   const [seasonNum, setSeasonNum] = useState(1);
   const [seasonNumEpisodes, setSeasonNumEpisodes] = useState(null);
@@ -23,12 +29,31 @@ function UpdateContentForm({
           setSeasonNumEpisodes(data);
         }),
     );
-  }, [seasonNum]);
+  }, [seasonNum, contentID]);
+  function updateLog(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    fetch("/api/logged_content", { method: "put", body: formData }); //TODO: probably do error handling or something
+    setSelectedLog(null);
+    //const queryParams = new URLSearchParams({'content_type' : formData['content_type'], });
+    //navigate(`/home?${queryParams}`);
+    //TODO: do something with query params so that filters are saved on refresh.
+    //a refresh is needed to reflect on the frontend the changes that have occurred on the database side.
+    navigate(0);
 
-  //TODO: add props for pre-populated fields from fetch in parent
-  // const [selectedContentType, setSelectedContentType] = useState("tv_show");
+    // navigate({
+    //   pathname: ".",
+    //   search: createSearchParams(formData).toString()
+    // });
+  }
+
   return (
-    <form action="/api/logged_content" method="put" class="form-example">
+    <form
+      /*action="/api/logged_content" method="put"*/ onSubmit={(e) =>
+        updateLog(e)
+      }
+      class="form-example"
+    >
       {" "}
       <div class="form-example">
         <input
@@ -63,6 +88,7 @@ function UpdateContentForm({
         <select
           id="status"
           name="status"
+          defaultValue={currentContentStatus}
           onChange={(e) => setContentStatus(e.target.value)}
           required
         >
@@ -82,18 +108,30 @@ function UpdateContentForm({
           min="0"
           max="10"
           step="0.1"
+          defaultValue={currentContentRating}
         />
       </div>
       <div class="form-example">
         <label for="title">Review: </label>{" "}
         {/* TODO make this input the thing where you can drag and expand the box */}
-        <input type="text" name="user_review" id="user_review" />
+        <input
+          type="text"
+          name="user_review"
+          id="user_review"
+          defaultValue={currentContentReview}
+        />
       </div>
       {/* TODO: figure out some logical way to log episodes*/}
       {contentType === "video_game" && (
         <div class="form-example">
           <label for="playtime">Playtime (hours): </label>
-          <input type="number" name="playtime" id="playtime" min="0" />
+          <input
+            type="number"
+            name="playtime"
+            id="playtime"
+            min="0"
+            defaultValue={currentContentPlaytime}
+          />
         </div>
       )}
       {contentType === "tv_show" &&
@@ -103,7 +141,7 @@ function UpdateContentForm({
             <input
               type="number"
               name="curr_season"
-              defaultValue="1"
+              defaultValue={currentSeason || "1"}
               id="curr_season"
               min="1"
               max={contentNumSeasons}
@@ -118,10 +156,10 @@ function UpdateContentForm({
             <input
               type="number"
               name="curr_episode"
-              defaultValue="1"
+              defaultValue={currentEpisode || "1"}
               id="curr_episode"
               min="1"
-              max={seasonNumEpisodes}
+              max={seasonNumEpisodes} //TODO: for some reason, the max for better call saul s2 is sometimes set to 2 initially, but gets set to 3 after toggling the season number
             />
           </div>
         )}

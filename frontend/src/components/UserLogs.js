@@ -6,7 +6,7 @@ import filterBoxes from "../config/filterBoxes";
 import FilterSettings from "./FilterSettings.js";
 import KeywordSearch from "./KeywordSearch.js";
 import SelectContentBox from "./SelectContentBox.js";
-import AddEpisodeForm from "./AddEpisodeForm.js";
+//import AddEpisodeForm from "./AddEpisodeForm.js";
 import UpdateContentForm from "./UpdateContentForm.js";
 
 function UserLogs() {
@@ -20,8 +20,12 @@ function UserLogs() {
 
   function handleSelect(e) {
     e.preventDefault();
-    //alert(e.target.id)
-    setSelectedLog(Number(e.target.id));
+    if (selectedLog === Number(e.target.id)) {
+      //toggle dropdown off
+      setSelectedLog(null);
+    } else {
+      setSelectedLog(Number(e.target.id));
+    }
   }
 
   useEffect(() => {
@@ -70,7 +74,6 @@ function UserLogs() {
             />
             {selectedLog === index && (
               <>
-                <AddEpisodeForm handleSubmit={(e) => e.preventDefault()} />
                 <UpdateContentForm
                   contentID={datum.id}
                   contentTitle={datum.title}
@@ -80,7 +83,10 @@ function UserLogs() {
                   currentContentRating={datum.rating}
                   currentContentReview={datum.user_review}
                   currentContentPlaytime={datum.playtime}
-                  // contentNumSeasons={datum.num_seasons}
+                  currentSeason={datum.curr_season}
+                  currentEpisode={datum.curr_episode}
+                  setSelectedLog={setSelectedLog}
+                  contentNumSeasons={datum.num_seasons}
                 />
               </>
             )}

@@ -56,7 +56,7 @@ with app.app_context():
     LoggedContent(user=testuser, content_ref=deathNote, status='completed', rating=9.0)
     LoggedContent(user=testuser, content_part_ref=deathNoteEpisode1, status='completed')
     LoggedContent(user=testuser, content_part_ref=deathNoteEpisode2, status='completed')
-    LoggedContent(user=testuser, content_ref=mobPsycho100, status='in_progress')
+    LoggedContent(user=testuser, content_ref=mobPsycho100, status='in_progress', curr_season=2, curr_episode=6)
     LoggedContent(user=testuser, content_ref=onePunchMan, status='on_hold')
     LoggedContent(user=testuser, content_ref=mandalorian, status='dropped') #i liked seasons one and 2 but season 3 felt forced to me because 2 had a good conclusion, also i was kind of tired of disney's star wars stuff after book of boba fett and obi wan
     
