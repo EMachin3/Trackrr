@@ -1,41 +1,45 @@
 const filterBoxes = {
+  defaultSearchParams: {
+    status: "in_progress",
+    content_type: "tv_show,movie,video_game,book,music,podcast",
+  },
   contentTypes: [
     {
       checkName: "tv_show",
       text: "TV",
       selectedColor: "red", //TODO put more thought into the color scheme for contentType
-      checked: true,
+      checked: false,
     },
     {
       checkName: "movie",
       text: "Movies",
       selectedColor: "orange",
       // 'defaultChecked': 'true', TODO: test if this is necessary for this and statusTypes
-      checked: true,
+      checked: false,
     },
     {
       checkName: "video_game",
       text: "Games",
       selectedColor: "yellow",
-      checked: true,
+      checked: false,
     },
     {
       checkName: "book",
       text: "Books",
       selectedColor: "green",
-      checked: true,
+      checked: false,
     },
     {
       checkName: "music",
       text: "Music",
       selectedColor: "blue",
-      checked: true,
+      checked: false,
     },
     {
       checkName: "podcast",
       text: "Podcasts",
       selectedColor: "violet",
-      checked: true,
+      checked: false,
     },
   ],
   statusBoxes: [
@@ -50,7 +54,7 @@ const filterBoxes = {
       text: "In Progress",
       selectedColor: "green",
       defaultChecked: "true",
-      checked: true,
+      checked: false,
     },
     {
       checkName: "want_to_consume",

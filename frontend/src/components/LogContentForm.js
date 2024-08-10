@@ -19,7 +19,7 @@ function LogContentForm({
           setSeasonNumEpisodes(data);
         }),
     );
-  }, [seasonNum]);
+  }, [seasonNum, contentID]);
 
   //TODO: add props for pre-populated fields from fetch in parent
   // const [selectedContentType, setSelectedContentType] = useState("tv_show");

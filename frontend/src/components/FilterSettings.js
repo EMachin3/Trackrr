@@ -2,10 +2,12 @@ import "../App.css";
 import { React } from "react";
 import styled from "styled-components";
 import TextualCheckbox from "../components/TextualCheckbox";
+import { useSearchParams } from "react-router-dom";
 // import filterBoxes from "../config/filterBoxes"
 
 //TODO: each click on a filter causes a TON of re-renders.
 function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   //const [checkedCheckboxes, setCheckedCheckboxes] = useState([]);
   // const [filterParams, setFilterParams] = useState({
   //   contentTypes: [],
@@ -31,9 +33,33 @@ function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
   function handleContentTypeChange(index) {
     setFilterParams({
       contentTypes: filterParams.contentTypes.map((contentType, currIndex) => {
-        return currIndex === index
-          ? { ...contentType, checked: !contentType.checked }
-          : contentType;
+        if (currIndex === index) {
+          if (contentType.checked) {
+            searchParams.set(
+              "content_type",
+              searchParams
+                .get("content_type")
+                .split(",")
+                .filter((type) => type !== contentType.checkName),
+            );
+          } else {
+            if (searchParams.get("content_type") === "") {
+              searchParams.set("content_type", [contentType.checkName]);
+            } else {
+              searchParams.set("content_type", [
+                ...searchParams.get("content_type").split(","),
+                contentType.checkName,
+              ]);
+            }
+          }
+          setSearchParams(searchParams);
+          return { ...contentType, checked: !contentType.checked };
+        } else {
+          return contentType;
+        }
+        // return currIndex === index
+        //   ? { ...contentType, checked: !contentType.checked }
+        //   : contentType;
       }),
       statusBoxes: filterParams.statusBoxes,
     });
@@ -42,10 +68,34 @@ function FilterSettings({ filterParams, setFilterParams /*, setQueryURL*/ }) {
   function handleStatusChange(index) {
     setFilterParams({
       contentTypes: filterParams.contentTypes,
-      statusBoxes: filterParams.statusBoxes.map((filterBox, currIndex) => {
-        return currIndex === index
-          ? { ...filterBox, checked: !filterBox.checked }
-          : filterBox;
+      statusBoxes: filterParams.statusBoxes.map((statusBox, currIndex) => {
+        if (currIndex === index) {
+          if (statusBox.checked) {
+            searchParams.set(
+              "status",
+              searchParams
+                .get("status")
+                .split(",")
+                .filter((status) => status !== statusBox.checkName),
+            );
+          } else {
+            if (searchParams.get("status") === "") {
+              searchParams.set("status", [statusBox.checkName]);
+            } else {
+              searchParams.set("status", [
+                ...searchParams.get("status").split(","),
+                statusBox.checkName,
+              ]);
+            }
+          }
+          setSearchParams(searchParams);
+          return { ...statusBox, checked: !statusBox.checked };
+        } else {
+          return statusBox;
+        }
+        // return currIndex === index
+        //   ? { ...filterBox, checked: !filterBox.checked }
+        //   : filterBox;
       }),
     });
     //console.log(filterParams)

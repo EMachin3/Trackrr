@@ -42,7 +42,10 @@ def test_form_submit():
         session.clear()
         session['user_id'] = user.id
         g.user = user
-        return redirect('/home')
+        return redirect('/home?status=in_progress&content_type=tv_show,movie,video_game,book,music,podcast') 
+           # TODO see frontend for notes on this, but basically, there probably shouldn't be 
+           # query params here (unless loaded from db for user-specific or something) but there
+           # are to make the code work currently
     g.user = None
     session.clear()
     print(error)
